@@ -1,0 +1,184 @@
+{
+  "rankings": {
+    "rankedCharacters": [
+      {
+        "rank": 1239681,
+        "score": 138.55,
+        "scoreColor": "#ffffff",
+        "runs": [
+          {
+            "zoneId": 15103,
+            "keystoneRunId": 475663,
+            "clearTimeMs": 2057558,
+            "mythicLevel": 2,
+            "score": 138.6,
+            "period": 1001,
+            "affixes": [],
+            "loggedRunId": 0,
+            "numChests": 0
+          }
+        ],
+        "character": {
+          "id": 210080961,
+          "persona_id": 21152407,
+          "name": "Døml",
+          "class": {
+            "id": 5,
+            "name": "Priest",
+            "slug": "priest"
+          },
+          "race": {
+            "id": 29,
+            "name": "Void Elf",
+            "slug": "void-elf",
+            "faction": "alliance"
+          },
+          "faction": "alliance",
+          "level": 80,
+          "spec": {
+            "id": 256,
+            "name": "Discipline",
+            "slug": "discipline",
+            "class_id": 5,
+            "role": "healer",
+            "is_melee": false,
+            "patch": "1.0.0",
+            "ordinal": 0
+          },
+          "path": "/characters/eu/perenolde/Døml",
+          "realm": {
+            "id": 682,
+            "connectedRealmId": 328,
+            "wowRealmId": 575,
+            "wowConnectedRealmId": 1401,
+            "name": "Perenolde",
+            "altName": null,
+            "slug": "perenolde",
+            "altSlug": "perenolde",
+            "locale": "de_DE",
+            "isConnected": true,
+            "realmType": "live"
+          },
+          "region": {
+            "name": "Europe",
+            "slug": "eu",
+            "short_name": "EU"
+          },
+          "stream": null,
+          "recruitmentProfiles": [],
+          "talentLoadoutText": "CAQAAAAAAAAAAAAAAAAAAAAAAAA2mZmxYMGzMjZ2MbzMzMzAAAAAAAAAAAwysMbMmZeAMLMMGjxMLsNTzMxyAmZAgBwsNbbgxmNA"
+        },
+        "guild": {
+          "id": 95545,
+          "name": "Azeroths Weltenbummler",
+          "faction": "alliance",
+          "realm": {
+            "id": 682,
+            "connectedRealmId": 328,
+            "wowRealmId": 575,
+            "wowConnectedRealmId": 1401,
+            "name": "Perenolde",
+            "altName": null,
+            "slug": "perenolde",
+            "altSlug": "perenolde",
+            "locale": "de_DE",
+            "isConnected": true,
+            "realmType": "live"
+          },
+          "region": {
+            "name": "German",
+            "slug": "eu",
+            "short_name": "DE"
+          },
+          "path": "/guilds/eu/perenolde/Azeroths%20Weltenbummler"
+        },
+        "patronLevel": null
+      },
+      {
+        "rank": 1239682,
+        "score": 138.55,
+        "scoreColor": "#ffffff",
+        "runs": [
+          {
+            "zoneId": 14954,
+            "keystoneRunId": 3754678,
+            "clearTimeMs": 2026399,
+            "mythicLevel": 2,
+            "score": 138.6,
+            "period": 1002,
+            "affixes": [],
+            "loggedRunId": 2115187,
+            "numChests": 0
+          }
+        ],
+        "character": {
+          "id": 235723035,
+          "persona_id": 54022319,
+          "name": "純愛牛頭人",
+          "class": {
+            "id": 7,
+            "name": "Shaman",
+            "slug": "shaman"
+          },
+          "race": {
+            "id": 6,
+            "name": "Tauren",
+            "slug": "tauren",
+            "faction": "horde"
+          },
+          "faction": "horde",
+          "level": 80,
+          "spec": {
+            "id": 264,
+            "name": "Restoration",
+            "slug": "restoration",
+            "class_id": 7,
+            "role": "healer",
+            "is_melee": false,
+            "patch": "1.0.0",
+            "ordinal": 2
+          },
+          "path": "/characters/tw/menethil/純愛牛頭人",
+          "realm": {
+            "id": 1901,
+            "connectedRealmId": 398,
+            "wowRealmId": 1006,
+            "wowConnectedRealmId": 966,
+            "name": "Menethil",
+            "altName": "米奈希爾",
+            "slug": "menethil",
+            "altSlug": "米奈希爾",
+            "locale": "zh_TW",
+            "isConnected": true,
+            "realmType": "live"
+          },
+          "region": {
+            "name": "Taiwan",
+            "slug": "tw",
+            "short_name": "TW"
+          },
+          "stream": null,
+          "recruitmentProfiles": [],
+          "talentLoadoutText": "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAzMzMLzsMzMzMYZsYGLsAbwMWMjtBwMwGzDMziFzyMzMystwMTjZGGGLGzgZZYWGDAAA"
+        },
+        "guild": null,
+        "patronLevel": null
+      }
+    ],
+    "ui": {
+      "region": "world",
+      "season": "season-tww-2",
+      "class": "all",
+      "role": "all",
+      "page": 30992,
+      "pageSize": 40,
+      "lastPage": 31692
+    },
+    "region": {
+      "name": "World",
+      "short_name": "World",
+      "slug": "world"
+    },
+    "realm": null
+  }
+}
