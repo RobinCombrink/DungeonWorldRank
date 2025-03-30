@@ -24,7 +24,6 @@ pub struct RankedCharacter {
     pub runs: Vec<Run>,
     pub character: Character,
     pub guild: Option<Guild>,
-    pub patron_level: Option<u32>, // patronLevel is null here, so Option is used
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -54,7 +53,6 @@ pub struct Character {
     pub race: Race,
     pub faction: String,
     pub level: u32,
-    pub spec: Spec,
     pub path: String,
     pub realm: Realm,
     pub region: Region,
@@ -63,7 +61,7 @@ pub struct Character {
     // recruitmentProfiles is an empty array in this sample,
     // so we use a vector of generic Value.
     pub recruitment_profiles: Vec<Value>,
-    pub talent_loadout_text: String,
+    pub talent_loadout_text: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -103,7 +101,7 @@ pub struct Spec {
 pub struct Realm {
     pub id: u32,
     pub connected_realm_id: u32,
-    pub wow_realm_id: u32,
+    pub wow_realm_id: Option<u32>,
     pub wow_connected_realm_id: u32,
     pub name: String,
     pub alt_name: Option<String>,
