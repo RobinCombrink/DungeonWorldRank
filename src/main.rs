@@ -1,20 +1,28 @@
-use std::str::FromStr;
-
 use anyhow::Result;
 use api_client::ApiClient;
-use from_response::FromResponse;
-use mythic_plus_characters::MythicPlusCharactersResponse;
-use reqwest::{blocking::ClientBuilder, Url};
+use clap::Parser;
 
 mod api_client;
 mod character;
 mod from_response;
 mod mythic_plus_characters;
 
+#[derive(Parser, Debug)]
+struct Arguments {
+    #[clap(short = 'n', long, default_value = "meleekick")]
+    name: String,
+    #[clap(short = 'r', long, default_value = "ravencrest")]
+    realm: String,
+    #[clap(long, default_value = "eu")]
+    region: character::Region,
+}
+
 fn main() -> Result<()> {
+    let args = Arguments::parse();
+
     let client = ApiClient::new();
 
-    let character = client.get_character(character::Region::EU, "ravencrest", "meleekick")?;
+    let character = client.get_character(args.region, args.realm, args.name)?;
     let total_characters = client.get_total_characters()?;
 
     let world_rank = character.mythic_plus_ranks.overall.world;

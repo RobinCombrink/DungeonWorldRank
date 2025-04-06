@@ -1,8 +1,9 @@
-use std::fmt::{Display, Write};
+use std::fmt::Display;
 
+use clap::{Parser, ValueEnum};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Parser, ValueEnum, Debug, Deserialize, Clone, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Region {
     CN,
