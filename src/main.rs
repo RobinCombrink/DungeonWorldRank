@@ -24,13 +24,18 @@ fn main() -> Result<()> {
 
     let character = client.get_character(args.region, args.realm, args.name)?;
     let total_characters = client.get_total_characters()?;
+    let total_class_characters = client.get_total_characters_by_class(&character.class)?;
 
     let world_rank = character.mythic_plus_ranks.overall.world;
-    let percentile = world_rank as f64 / total_characters as f64 * 100 as f64;
+    let world_percentile = world_rank as f64 / total_characters as f64 * 100 as f64;
+
+    let class_rank = character.mythic_plus_ranks.class.world;
+    let class_percetile = class_rank as f64 / total_class_characters as f64 * 100 as f64;
 
     println!(
-        "Character: {character}\nRealm: {realm}\nRegion: {region}\nWorld Rank: {world_rank}\nTotal Char: {total_characters}\nPercentile: {:.03}%",
-        percentile,
+        "\n{character}-{realm} - {region}\n\nWorld Rank: {world_rank}/{total_characters}\nWorld Percentile: {:.03}%\n\nClass Rank: {class_rank}/{total_class_characters}\nClass Percentile: {:.03}%",
+        world_percentile,
+        class_percetile,
         character = character.name,
         realm = character.realm,
         region = character.region,
