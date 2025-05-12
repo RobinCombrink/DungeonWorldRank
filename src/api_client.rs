@@ -9,7 +9,7 @@ use reqwest::{
 use crate::{
     character::{CharacterResponse, Region},
     from_response::FromResponse,
-    mythic_plus_characters::{Class, MythicPlusCharactersResponse},
+    mythic_plus_characters::MythicPlusCharactersResponse,
 };
 
 pub struct ApiClient {
@@ -69,8 +69,10 @@ impl ApiClient {
     pub fn get_total_characters_by_class(&self, class: &str) -> Result<u32> {
         let first_characters_page = self.get_mythic_plus_characters_by_class(class, 0)?;
 
-        let last_characters_page =
-            self.get_mythic_plus_characters_by_class(class, first_characters_page.rankings.ui.last_page)?;
+        let last_characters_page = self.get_mythic_plus_characters_by_class(
+            class,
+            first_characters_page.rankings.ui.last_page,
+        )?;
 
         let total_characters_from_pages = last_characters_page.rankings.ui.page_size
             * (last_characters_page.rankings.ui.last_page - 1);
@@ -100,8 +102,11 @@ impl ApiClient {
         MythicPlusCharactersResponse::from_response(response)
     }
 
-
-    pub fn get_mythic_plus_characters_by_class(&self, class: &str, page: u32) -> Result<MythicPlusCharactersResponse> {
+    pub fn get_mythic_plus_characters_by_class(
+        &self,
+        class: &str,
+        page: u32,
+    ) -> Result<MythicPlusCharactersResponse> {
         let url = self.base_url.join("mythic-plus/rankings/characters")?;
 
         let response = self
