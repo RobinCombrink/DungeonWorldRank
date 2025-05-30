@@ -24,6 +24,8 @@ struct Arguments {
 fn main() -> Result<()> {
     let args = Arguments::parse();
     setup_logging(args.debug);
+    
+    println!("Calculating world rank");
 
     let client = ApiClient::new();
 
