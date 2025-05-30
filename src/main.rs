@@ -1,6 +1,8 @@
 use anyhow::Result;
 use api_client::ApiClient;
 use clap::Parser;
+use log::LevelFilter;
+use std::io::Write;
 
 mod api_client;
 mod character;
@@ -15,10 +17,13 @@ struct Arguments {
     realm: String,
     #[clap(long, default_value = "eu")]
     region: character::Region,
+    #[clap(long, default_value_t = false)]
+    debug: bool,
 }
 
 fn main() -> Result<()> {
     let args = Arguments::parse();
+    setup_logging(args.debug);
 
     let client = ApiClient::new();
 
@@ -41,4 +46,27 @@ fn main() -> Result<()> {
         region = character.region,
     );
     return Ok(());
+}
+
+fn setup_logging(debug: bool) {
+    let level_filter = match debug {
+        true => LevelFilter::Debug,
+        false => LevelFilter::Warn,
+    };
+
+    env_logger::builder()
+        .filter_level(level_filter)
+        .parse_default_env()
+        .format(|buf, record| {
+            writeln!(
+                buf,
+                "{}:{} {} [{}] - {}",
+                record.file().unwrap_or("unknown"),
+                record.line().unwrap_or(0),
+                chrono::Local::now().format("%H:%M:%S"),
+                record.level(),
+                record.args()
+            )
+        })
+        .init();
 }

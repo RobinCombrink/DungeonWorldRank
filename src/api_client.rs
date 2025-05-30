@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use anyhow::Result;
+use log::debug;
 use reqwest::{
     blocking::{Client, ClientBuilder},
     Url,
@@ -97,7 +98,7 @@ impl ApiClient {
             .send()?;
 
         let url = response.url();
-        println!("{}", url);
+        debug!("{}", url);
 
         MythicPlusCharactersResponse::from_response(response)
     }
@@ -122,7 +123,7 @@ impl ApiClient {
             .send()?;
 
         let url = response.url();
-        println!("{}", url);
+        debug!("{}", url);
 
         MythicPlusCharactersResponse::from_response(response)
     }
