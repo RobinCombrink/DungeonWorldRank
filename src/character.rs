@@ -92,7 +92,7 @@ impl Display for CharacterWorldRank {
         realm = self.character_rank.realm,
         region = self.character_rank.region,
         world_rank = self.character_rank.world_rank,
-        total_characters = self.world_details.total_class_characters,
+        total_characters = self.world_details.total_characters,
         world_percentile = self.calculate_world_percentile(),
         class_rank = self.character_rank.class_rank,
         total_class_characters = self.world_details.total_class_characters,
