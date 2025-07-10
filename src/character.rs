@@ -137,11 +137,11 @@ impl WorldDetails {
 }
 
 impl CharacterResponse {
-    pub fn get_world_rank(self, client: ApiClient) -> Result<CharacterWorldRank> {
+    pub async fn get_world_rank(self, client: ApiClient) -> Result<CharacterWorldRank> {
         let character_rank = CharacterRank::from(&self);
 
-        let total_world_characters = client.get_total_characters()?;
-        let total_class_characters = client.get_total_characters_by_class(&self.class)?;
+        let total_world_characters = client.get_total_characters().await?;
+        let total_class_characters = client.get_total_characters_by_class(&self.class).await?;
 
         let world_details = WorldDetails::new(total_world_characters, total_class_characters);
 

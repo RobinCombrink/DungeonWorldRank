@@ -3,8 +3,7 @@ use std::str::FromStr;
 use anyhow::Result;
 use log::debug;
 use reqwest::{
-    blocking::{Client, ClientBuilder},
-    Url,
+    Url, {Client, ClientBuilder},
 };
 
 use crate::{
@@ -30,7 +29,7 @@ impl ApiClient {
         }
     }
 
-    pub fn get_character(
+    pub async fn get_character(
         &self,
         region: Region,
         realm: impl Into<String>,
@@ -50,15 +49,17 @@ impl ApiClient {
                 ("name", name.into().as_ref()),
                 ("fields", "mythic_plus_ranks"),
             ])
-            .send()?;
-        CharacterResponse::from_response(response)
+            .send()
+            .await?;
+        CharacterResponse::from_response(response).await
     }
 
-    pub fn get_total_characters(&self) -> Result<u32> {
-        let first_characters_page = self.get_mythic_plus_characters(0)?;
+    pub async fn get_total_characters(&self) -> Result<u32> {
+        let first_characters_page = self.get_mythic_plus_characters(0).await?;
 
-        let last_characters_page =
-            self.get_mythic_plus_characters(first_characters_page.rankings.ui.last_page)?;
+        let last_characters_page = self
+            .get_mythic_plus_characters(first_characters_page.rankings.ui.last_page)
+            .await?;
 
         let total_characters_from_pages = last_characters_page.rankings.ui.page_size
             * (last_characters_page.rankings.ui.last_page - 1);
@@ -68,13 +69,12 @@ impl ApiClient {
         Ok(total_characters)
     }
 
-    pub fn get_total_characters_by_class(&self, class: &str) -> Result<u32> {
-        let first_characters_page = self.get_mythic_plus_characters_by_class(class, 0)?;
+    pub async fn get_total_characters_by_class(&self, class: &str) -> Result<u32> {
+        let first_characters_page = self.get_mythic_plus_characters_by_class(class, 0).await?;
 
-        let last_characters_page = self.get_mythic_plus_characters_by_class(
-            class,
-            first_characters_page.rankings.ui.last_page,
-        )?;
+        let last_characters_page = self
+            .get_mythic_plus_characters_by_class(class, first_characters_page.rankings.ui.last_page)
+            .await?;
 
         let total_characters_from_pages = last_characters_page.rankings.ui.page_size
             * (last_characters_page.rankings.ui.last_page - 1);
@@ -83,7 +83,10 @@ impl ApiClient {
 
         Ok(total_characters)
     }
-    pub fn get_mythic_plus_characters(&self, page: u32) -> Result<MythicPlusCharactersResponse> {
+    pub async fn get_mythic_plus_characters(
+        &self,
+        page: u32,
+    ) -> Result<MythicPlusCharactersResponse> {
         let url = self.base_url.join("mythic-plus/rankings/characters")?;
 
         let response = self
@@ -96,15 +99,16 @@ impl ApiClient {
                 ("role", "all"),
                 ("page", &format!("{:?}", page)),
             ])
-            .send()?;
+            .send()
+            .await?;
 
         let url = response.url();
         debug!("{}", url);
 
-        MythicPlusCharactersResponse::from_response(response)
+        MythicPlusCharactersResponse::from_response(response).await
     }
 
-    pub fn get_mythic_plus_characters_by_class(
+    pub async fn get_mythic_plus_characters_by_class(
         &self,
         class: &str,
         page: u32,
@@ -121,20 +125,21 @@ impl ApiClient {
                 ("role", "all"),
                 ("page", &format!("{:?}", page)),
             ])
-            .send()?;
+            .send()
+            .await?;
 
         let url = response.url();
         debug!("{}", url);
 
-        MythicPlusCharactersResponse::from_response(response)
+        MythicPlusCharactersResponse::from_response(response).await
     }
 
-    pub fn get_historical_dungeon_rank(&self, run_id: String) -> Result<usize> {
-        let dungeon_run = self.get_dungeon_run(run_id)?;
+    pub async fn get_historical_dungeon_rank(&self, run_id: String) -> Result<usize> {
+        let dungeon_run = self.get_dungeon_run(run_id).await?;
 
         let dungeon_slug = dungeon_run.keystone_run.dungeon.slug;
 
-        let all_dungeon_runs = self.get_all_runs_by_dungeon(dungeon_slug)?;
+        let all_dungeon_runs = self.get_all_runs_by_dungeon(dungeon_slug).await?;
 
         let mut time_filtered_runs = all_dungeon_runs
             .into_iter()
@@ -155,7 +160,7 @@ impl ApiClient {
         Ok(historical_dungeon_rank)
     }
 
-    pub fn get_dungeon_run(&self, run_id: String) -> Result<KeystoneRunResponse> {
+    pub async fn get_dungeon_run(&self, run_id: String) -> Result<KeystoneRunResponse> {
         let url = self
             .base_url
             .join("mythic-plus/")?
@@ -167,30 +172,35 @@ impl ApiClient {
             .client
             .get(url)
             .header("accept", "application/json")
-            .send()?;
+            .send()
+            .await?;
 
         let url = response.url();
         debug!("{}", url);
 
-        KeystoneRunResponse::from_response(response)
+        KeystoneRunResponse::from_response(response).await
     }
 
-    pub fn get_all_runs_by_dungeon(&self, dungeon: String) -> Result<Vec<RankedGroup>> {
-        let first_runs_page = self.get_dungeon_runs(dungeon.clone(), 0)?;
+    pub async fn get_all_runs_by_dungeon(&self, dungeon: String) -> Result<Vec<RankedGroup>> {
+        let first_runs_page = self.get_dungeon_runs(dungeon.clone(), 0).await?;
 
         let total_pages = first_runs_page.rankings.ui.last_page;
 
         let mut dungeon_runs = vec![];
 
         for i in 0..total_pages {
-            let dungeon_runs_response = self.get_dungeon_runs(dungeon.clone(), i)?;
+            let dungeon_runs_response = self.get_dungeon_runs(dungeon.clone(), i).await?;
             dungeon_runs.extend(dungeon_runs_response.rankings.ranked_groups);
         }
 
         Ok(dungeon_runs)
     }
 
-    pub fn get_dungeon_runs(&self, dungeon: String, page: u32) -> Result<MythicPlusGroupsResponse> {
+    pub async fn get_dungeon_runs(
+        &self,
+        dungeon: String,
+        page: u32,
+    ) -> Result<MythicPlusGroupsResponse> {
         let url = self
             .base_url
             .join("mythic-plus/")?
@@ -210,11 +220,11 @@ impl ApiClient {
                 ("page", &format!("{:?}", page)),
             ])
             .header("referrer", format!("https://raider.io/mythic-plus-rankings/season-tww-2/cinderbrew-meadery/world/leaderboards-strict/{}", page))
-            .send()?;
+            .send().await?;
 
         let url = response.url();
         debug!("{}", url);
 
-        MythicPlusGroupsResponse::from_response(response)
+        MythicPlusGroupsResponse::from_response(response).await
     }
 }

@@ -47,7 +47,8 @@ struct Arguments {
     )]
     debug: bool,
 }
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let args = Arguments::parse();
     setup_logging(args.debug);
 
@@ -57,14 +58,16 @@ fn main() -> Result<()> {
 
     match args.command {
         Command::CharacterRank(args) => {
-            let character = client.get_character(args.region, args.realm, args.name)?;
+            let character = client
+                .get_character(args.region, args.realm, args.name)
+                .await?;
 
-            let world_rank = character.get_world_rank(client)?;
+            let world_rank = character.get_world_rank(client).await?;
 
             println!("{}", world_rank);
         }
         Command::HistoricalDungeonRank(args) => {
-            let historical_dungeon_rank = client.get_historical_dungeon_rank(args.run_id)?;
+            let historical_dungeon_rank = client.get_historical_dungeon_rank(args.run_id).await?;
             println!("historical dungeon rank: {}", historical_dungeon_rank)
         }
     };
