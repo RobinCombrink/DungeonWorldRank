@@ -183,24 +183,40 @@ impl ApiClient {
     }
 
     pub async fn get_all_runs_by_dungeon(&self, dungeon: String) -> Result<Vec<RankedGroup>> {
+        use futures::{stream, StreamExt, TryStreamExt};
         let first_runs_page = self.get_dungeon_runs(dungeon.clone(), 0).await?;
-
         let total_pages = first_runs_page.rankings.ui.last_page;
-
-        let tasks = (0..total_pages)
-            .collect::<Vec<_>>()
+        let page_indices: Vec<u32> = (0..total_pages).collect();
+        let batches: Vec<&[u32]> = page_indices.chunks(25).collect();
+        let all_groups = stream::iter(batches)
+            .then(|batch| {
+                let dungeon = dungeon.clone();
+                async move {
+                    let tasks = batch
+                        .iter()
+                        .map(|&page| self.get_dungeon_runs(dungeon.clone(), page));
+                    println!(
+                        "Batch: {} - {} / {}",
+                        batch.first().expect("Expected an item in the batch"),
+                        batch.last().expect("Expected an item in the batch"),
+                        total_pages,
+                    );
+                    futures::future::join_all(tasks).await
+                }
+            })
+            .then(|results| async move {
+                results
+                    .into_iter()
+                    .map(|result| result.map(|response| response.rankings.ranked_groups))
+                    .collect::<Result<Vec<_>>>()
+            })
+            .try_collect::<Vec<_>>()
+            .await?
             .into_iter()
-            .map(async |page| self.get_dungeon_runs(dungeon.clone(), page).await);
-
-        let dungeon_runs = futures::future::join_all(tasks)
-            .await
-            .into_iter()
-            .collect::<Result<Vec<_>>>()?
-            .into_iter()
-            .flat_map(|response| response.rankings.ranked_groups)
+            .flatten()
+            .flatten()
             .collect();
-
-        Ok(dungeon_runs)
+        Ok(all_groups)
     }
 
     pub async fn get_dungeon_runs(
