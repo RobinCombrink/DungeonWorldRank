@@ -128,6 +128,7 @@ impl ApiClient {
 
         MythicPlusCharactersResponse::from_response(response)
     }
+
     pub fn get_historical_dungeon_rank(&self, run_id: String) -> Result<usize> {
         let dungeon_run = self.get_dungeon_run(run_id)?;
 
@@ -157,9 +158,10 @@ impl ApiClient {
     pub fn get_dungeon_run(&self, run_id: String) -> Result<KeystoneRunResponse> {
         let url = self
             .base_url
-            .join("mythic-plus-runs")?
-            .join("season-tww-2")?
-            .join(&run_id)?.join("-18-cinderbrew-meadery")?;
+            .join("mythic-plus/")?
+            .join("runs/")?
+            .join("season-tww-2/")?
+            .join(&run_id)?;
 
         let response = self
             .client
@@ -180,7 +182,7 @@ impl ApiClient {
 
         let mut dungeon_runs = vec![];
 
-        for i in 0..2 {
+        for i in 0..total_pages {
             let dungeon_runs_response = self.get_dungeon_runs(dungeon.clone(), i)?;
             dungeon_runs.extend(dungeon_runs_response.rankings.ranked_groups);
         }
@@ -189,7 +191,11 @@ impl ApiClient {
     }
 
     pub fn get_dungeon_runs(&self, dungeon: String, page: u32) -> Result<MythicPlusGroupsResponse> {
-        let url = self.base_url.join("mythic-plus/rankings/runs")?;
+        let url = self
+            .base_url
+            .join("mythic-plus/")?
+            .join("rankings/")?
+            .join("runs")?;
 
         let response = self
             .client

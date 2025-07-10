@@ -66,7 +66,7 @@ fn main() -> Result<()> {
         Command::HistoricalDungeonRank(args) => {
             let historical_dungeon_rank = client.get_historical_dungeon_rank(args.run_id)?;
             println!("historical dungeon rank: {}", historical_dungeon_rank)
-        },
+        }
     };
 
     return Ok(());

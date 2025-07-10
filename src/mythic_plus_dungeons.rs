@@ -26,30 +26,39 @@ pub struct RankedGroup {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupRun {
+    #[serde(rename = "keystone_team_id")]
     pub keystone_team_id: u64,
     pub season: String,
     pub status: String,
     pub dungeon: GroupDungeon,
+    #[serde(rename = "keystone_run_id")]
     pub keystone_run_id: u64,
+    #[serde(rename = "mythic_level")]
     pub mythic_level: u32,
+    #[serde(rename = "clear_time_ms")]
     pub clear_time_ms: u64,
+    #[serde(rename = "keystone_time_ms")]
     pub keystone_time_ms: u64,
+    #[serde(rename = "completed_at")]
     pub completed_at: DateTime<Utc>,
+    #[serde(rename = "num_chests")]
     pub num_chests: u32,
-    pub time_remaining_ms: u64,
+    #[serde(rename = "time_remaining_ms")]
+    pub time_remaining_ms: i128,
     pub logged_run_id: Option<u64>,
     pub videos: Vec<serde_json::Value>,
+    #[serde(rename = "weekly_modifiers")]
     pub weekly_modifiers: Vec<GroupModifier>,
+    #[serde(rename = "num_modifiers_active")]
     pub num_modifiers_active: u32,
     pub faction: String,
     pub deleted_at: Option<serde_json::Value>,
+    #[serde(rename = " keystone_platoon_id")]
     pub keystone_platoon_id: Option<serde_json::Value>,
     pub platoon: Option<serde_json::Value>,
-    pub roster: Vec<GroupRosterEntry>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct GroupDungeon {
     #[serde(rename = "type")]
     pub dungeon_type: String,
@@ -96,14 +105,14 @@ pub struct GroupCharacter {
     pub name: String,
     pub class: GroupClass,
     pub race: GroupRace,
-    pub faction: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub faction: Option<String>,
     pub level: u32,
     pub spec: GroupSpec,
     pub path: String,
     pub realm: GroupRealm,
     pub region: GroupRegion,
     pub stream: Option<serde_json::Value>,
-    #[serde(rename = "recruitmentProfiles")]
     pub recruitment_profiles: Vec<serde_json::Value>,
 }
 
@@ -121,7 +130,8 @@ pub struct GroupRace {
     pub id: u32,
     pub name: String,
     pub slug: String,
-    pub faction: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub faction: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -136,22 +146,15 @@ pub struct GroupSpec {
 #[serde(rename_all = "camelCase")]
 pub struct GroupRealm {
     pub id: u32,
-    #[serde(rename = "connectedRealmId")]
     pub connected_realm_id: u32,
-    #[serde(rename = "wowRealmId")]
     pub wow_realm_id: u32,
-    #[serde(rename = "wowConnectedRealmId")]
     pub wow_connected_realm_id: u32,
     pub name: String,
-    #[serde(rename = "altName")]
     pub alt_name: Option<String>,
     pub slug: String,
-    #[serde(rename = "altSlug")]
     pub alt_slug: Option<String>,
     pub locale: String,
-    #[serde(rename = "isConnected")]
     pub is_connected: bool,
-    #[serde(rename = "realmType")]
     pub realm_type: String,
 }
 
@@ -176,16 +179,16 @@ pub struct GroupsUi {
     pub min_mythic_level: u32,
     pub max_mythic_level: u32,
     pub event_id: u32,
-    pub faction: String,
-    pub realm: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub realm: Option<String>,
     pub period: u32,
     pub recent: bool,
     pub last_page: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct KeystoneRunResponse {
-    #[serde(rename = "keystoneRun")]
     pub keystone_run: KeystoneRun,
 }
 
@@ -195,33 +198,40 @@ pub struct KeystoneRun {
     pub season: String,
     pub status: String,
     pub dungeon: GroupDungeon,
+    #[serde(rename = "keystone_run_id")]
     pub keystone_run_id: u64,
+    #[serde(rename = "mythic_level")]
     pub mythic_level: u32,
+    #[serde(rename = "clear_time_ms")]
     pub clear_time_ms: u64,
+    #[serde(rename = "keystone_time_ms")]
     pub keystone_time_ms: u64,
+    #[serde(rename = "completed_at")]
     pub completed_at: DateTime<Utc>,
+    #[serde(rename = "num_chests")]
     pub num_chests: u32,
-    pub time_remaining_ms: u64,
+    #[serde(rename = "time_remaining_ms")]
+    pub time_remaining_ms: i128,
     pub logged_run_id: Option<u64>,
     pub videos: Vec<serde_json::Value>,
+    #[serde(rename = "weekly_modifiers")]
     pub weekly_modifiers: Vec<serde_json::Value>,
+    #[serde(rename = "num_modifiers_active")]
     pub num_modifiers_active: u32,
     pub faction: String,
     pub deleted_at: Option<serde_json::Value>,
-    pub score: u32,
-    pub logged_details: Option<serde_json::Value>,
+    pub score: f64,
+    #[serde(rename = "replay_limit")]
     pub replay_limit: u32,
+    #[serde(rename = "keystone_team_id")]
     pub keystone_team_id: u64,
+    #[serde(rename = "keystone_platoon_id")]
     pub keystone_platoon_id: Option<serde_json::Value>,
-    #[serde(rename = "isTournamentProfile")]
     pub is_tournament_profile: bool,
     pub can_manage_own_videos: bool,
     pub can_manage_others_videos: bool,
-    #[serde(rename = "loggedSources")]
     pub logged_sources: Vec<serde_json::Value>,
-    #[serde(rename = "isPatron")]
     pub is_patron: bool,
-    #[serde(rename = "runPrivacyMode")]
     pub run_privacy_mode: String,
     pub can_view_private_details: bool,
     pub is_viewing_private_details: bool,
