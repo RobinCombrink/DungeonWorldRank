@@ -5,6 +5,7 @@ use log::debug;
 use reqwest::{
     Url, {Client, ClientBuilder},
 };
+use tokio::task::JoinSet;
 
 use crate::{
     character::{CharacterResponse, Region},
@@ -186,12 +187,18 @@ impl ApiClient {
 
         let total_pages = first_runs_page.rankings.ui.last_page;
 
-        let mut dungeon_runs = vec![];
+        let tasks = (0..total_pages)
+            .collect::<Vec<_>>()
+            .into_iter()
+            .map(async |page| self.get_dungeon_runs(dungeon.clone(), page).await);
 
-        for i in 0..total_pages {
-            let dungeon_runs_response = self.get_dungeon_runs(dungeon.clone(), i).await?;
-            dungeon_runs.extend(dungeon_runs_response.rankings.ranked_groups);
-        }
+        let dungeon_runs = futures::future::join_all(tasks)
+            .await
+            .into_iter()
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .flat_map(|response| response.rankings.ranked_groups)
+            .collect();
 
         Ok(dungeon_runs)
     }
