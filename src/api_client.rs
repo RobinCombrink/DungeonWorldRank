@@ -1,18 +1,19 @@
 use std::str::FromStr;
 
+use crate::{
+    character::{CharacterResponse, Region},
+    expansion::{Expansion, Season, SeasonsResponse},
+    from_response::FromResponse,
+    mythic_plus_characters::MythicPlusCharactersResponse,
+    mythic_plus_dungeons::{KeystoneRunResponse, MythicPlusGroupsResponse, RankedGroup},
+};
+use anyhow::anyhow;
 use anyhow::Result;
 use log::debug;
 use reqwest::{
     Url, {Client, ClientBuilder},
 };
-use tokio::task::JoinSet;
-
-use crate::{
-    character::{CharacterResponse, Region},
-    from_response::FromResponse,
-    mythic_plus_characters::MythicPlusCharactersResponse,
-    mythic_plus_dungeons::{KeystoneRunResponse, MythicPlusGroupsResponse, RankedGroup},
-};
+use serde::Deserialize;
 
 pub struct ApiClient {
     client: Client,
@@ -28,6 +29,37 @@ impl ApiClient {
                 .join("api/")
                 .unwrap(),
         }
+    }
+
+    async fn get_expansion_seasons(&self, expansion: Expansion) -> Result<SeasonsResponse> {
+        let url = self
+            .base_url
+            .join("v1/")?
+            .join("mythic-plus/")?
+            .join("static-data")?;
+
+        let expansion_id: u8 = expansion.into();
+
+        let response = self
+            .client
+            .get(url)
+            .query(&[("expansion_id", expansion_id)])
+            .send()
+            .await?;
+
+        let url = response.url();
+        debug!("{}", url);
+
+        SeasonsResponse::from_response(response).await
+    }
+
+    pub async fn get_current_season(&self, expansion: Expansion) -> Result<Season> {
+        self.get_expansion_seasons(expansion)
+            .await?
+            .seasons
+            .into_iter()
+            .find(|item| item.is_main_season)
+            .ok_or_else(|| anyhow!("Could not find current season"))
     }
 
     pub async fn get_character(
@@ -55,11 +87,11 @@ impl ApiClient {
         CharacterResponse::from_response(response).await
     }
 
-    pub async fn get_total_characters(&self) -> Result<u32> {
-        let first_characters_page = self.get_mythic_plus_characters(0).await?;
+    pub async fn get_total_characters(&self, season: &Season) -> Result<u32> {
+        let first_characters_page = self.get_mythic_plus_characters(0, season).await?;
 
         let last_characters_page = self
-            .get_mythic_plus_characters(first_characters_page.rankings.ui.last_page)
+            .get_mythic_plus_characters(first_characters_page.rankings.ui.last_page, season)
             .await?;
 
         let total_characters_from_pages = last_characters_page.rankings.ui.page_size
@@ -70,11 +102,17 @@ impl ApiClient {
         Ok(total_characters)
     }
 
-    pub async fn get_total_characters_by_class(&self, class: &str) -> Result<u32> {
-        let first_characters_page = self.get_mythic_plus_characters_by_class(class, 0).await?;
+    pub async fn get_total_characters_by_class(&self, class: &str, season: &Season) -> Result<u32> {
+        let first_characters_page = self
+            .get_mythic_plus_characters_by_class(class, 0, season)
+            .await?;
 
         let last_characters_page = self
-            .get_mythic_plus_characters_by_class(class, first_characters_page.rankings.ui.last_page)
+            .get_mythic_plus_characters_by_class(
+                class,
+                first_characters_page.rankings.ui.last_page,
+                season,
+            )
             .await?;
 
         let total_characters_from_pages = last_characters_page.rankings.ui.page_size
@@ -87,6 +125,7 @@ impl ApiClient {
     pub async fn get_mythic_plus_characters(
         &self,
         page: u32,
+        season: &Season,
     ) -> Result<MythicPlusCharactersResponse> {
         let url = self.base_url.join("mythic-plus/rankings/characters")?;
 
@@ -95,7 +134,7 @@ impl ApiClient {
             .get(url)
             .query(&[
                 ("region", "world"),
-                ("season", "season-tww-2"),
+                ("season", &season.slug),
                 ("class", "all"),
                 ("role", "all"),
                 ("page", &format!("{:?}", page)),
@@ -113,6 +152,7 @@ impl ApiClient {
         &self,
         class: &str,
         page: u32,
+        season: &Season,
     ) -> Result<MythicPlusCharactersResponse> {
         let url = self.base_url.join("mythic-plus/rankings/characters")?;
 
@@ -121,7 +161,7 @@ impl ApiClient {
             .get(url)
             .query(&[
                 ("region", "world"),
-                ("season", "season-tww-2"),
+                ("season", &season.slug),
                 ("class", &format!("{}", class)),
                 ("role", "all"),
                 ("page", &format!("{:?}", page)),
@@ -187,7 +227,7 @@ impl ApiClient {
         let first_runs_page = self.get_dungeon_runs(dungeon.clone(), 0).await?;
         let total_pages = first_runs_page.rankings.ui.last_page;
         let page_indices: Vec<u32> = (0..total_pages).collect();
-        let batches: Vec<&[u32]> = page_indices.chunks(25).collect();
+        let batches: Vec<&[u32]> = page_indices.chunks(50).collect();
         let all_groups = stream::iter(batches)
             .then(|batch| {
                 let dungeon = dungeon.clone();

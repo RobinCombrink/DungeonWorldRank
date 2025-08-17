@@ -4,7 +4,7 @@ use anyhow::Result;
 use clap::{Parser, ValueEnum};
 use serde::{Deserialize, Serialize};
 
-use crate::api_client::ApiClient;
+use crate::{api_client::ApiClient, expansion::Expansion};
 
 #[derive(Parser, ValueEnum, Debug, Deserialize, Clone, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -139,9 +139,12 @@ impl WorldDetails {
 impl CharacterResponse {
     pub async fn get_world_rank(self, client: ApiClient) -> Result<CharacterWorldRank> {
         let character_rank = CharacterRank::from(&self);
+        let season = client.get_current_season(Expansion::TheWarWithin).await?;
 
-        let total_world_characters = client.get_total_characters().await?;
-        let total_class_characters = client.get_total_characters_by_class(&self.class).await?;
+        let total_world_characters = client.get_total_characters(&season).await?;
+        let total_class_characters = client
+            .get_total_characters_by_class(&self.class, &season)
+            .await?;
 
         let world_details = WorldDetails::new(total_world_characters, total_class_characters);
 

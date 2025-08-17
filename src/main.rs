@@ -9,6 +9,7 @@ mod character;
 mod from_response;
 mod mythic_plus_characters;
 mod mythic_plus_dungeons;
+mod expansion;
 
 #[derive(Parser, Debug)]
 enum Command {
