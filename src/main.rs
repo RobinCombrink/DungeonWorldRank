@@ -4,12 +4,14 @@ use clap::{Args, Parser};
 use log::LevelFilter;
 use std::io::Write;
 
+use crate::character::Region;
+
 mod api_client;
 mod character;
+mod expansion;
 mod from_response;
 mod mythic_plus_characters;
 mod mythic_plus_dungeons;
-mod expansion;
 
 #[derive(Parser, Debug)]
 enum Command {
@@ -28,6 +30,16 @@ struct CharacterRankArgs {
     region: character::Region,
 }
 
+impl Default for CharacterRankArgs {
+    fn default() -> Self {
+        Self {
+            name: "meleekick".to_owned(),
+            realm: "ravencrest".to_owned(),
+            region: Region::EU,
+        }
+    }
+}
+
 #[derive(Args, Debug)]
 #[clap(about = "Get the world rank of a dungeon when it was completed")]
 struct HistoricalDungeonRankArgs {
@@ -40,7 +52,7 @@ struct HistoricalDungeonRankArgs {
 #[command(version, about, long_about = None)]
 struct Arguments {
     #[command(subcommand)]
-    command: Command,
+    command: Option<Command>,
     #[arg(
         global = true,
         long("debug"),
@@ -58,22 +70,26 @@ async fn main() -> Result<()> {
     let client = ApiClient::new();
 
     match args.command {
-        Command::CharacterRank(args) => {
-            let character = client
-                .get_character(args.region, args.realm, args.name)
-                .await?;
+        Some(command) => match command {
+            Command::CharacterRank(args) => get_character_rank(client, args).await,
+            Command::HistoricalDungeonRank(args) => {
+                let historical_dungeon_rank =
+                    client.get_historical_dungeon_rank(args.run_id).await?;
+                println!("historical dungeon rank: {}", historical_dungeon_rank);
+                Ok(())
+            }
+        },
+        None => get_character_rank(client, CharacterRankArgs::default()).await,
+    }
+}
 
-            let world_rank = character.get_world_rank(client).await?;
-
-            println!("{}", world_rank);
-        }
-        Command::HistoricalDungeonRank(args) => {
-            let historical_dungeon_rank = client.get_historical_dungeon_rank(args.run_id).await?;
-            println!("historical dungeon rank: {}", historical_dungeon_rank)
-        }
-    };
-
-    return Ok(());
+async fn get_character_rank(client: ApiClient, args: CharacterRankArgs) -> Result<()> {
+    let character = client
+        .get_character(args.region, args.realm, args.name)
+        .await?;
+    let world_rank = character.get_world_rank(client).await?;
+    println!("{}", world_rank);
+    Ok(())
 }
 
 fn setup_logging(debug: bool) {

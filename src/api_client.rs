@@ -13,7 +13,6 @@ use log::debug;
 use reqwest::{
     Url, {Client, ClientBuilder},
 };
-use serde::Deserialize;
 
 pub struct ApiClient {
     client: Client,
