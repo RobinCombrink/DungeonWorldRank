@@ -137,9 +137,13 @@ impl WorldDetails {
 }
 
 impl CharacterResponse {
-    pub async fn get_world_rank(self, client: ApiClient) -> Result<CharacterWorldRank> {
+    pub async fn get_world_rank(
+        self,
+        client: ApiClient,
+        expansion: Expansion,
+    ) -> Result<CharacterWorldRank> {
         let character_rank = CharacterRank::from(&self);
-        let season = client.get_current_season(Expansion::TheWarWithin).await?;
+        let season = client.get_current_season(expansion).await?;
 
         let total_world_characters = client.get_total_characters(&season).await?;
         let total_class_characters = client

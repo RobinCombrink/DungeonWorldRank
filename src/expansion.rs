@@ -1,21 +1,29 @@
-use serde::Deserialize;
+use clap::{Parser, ValueEnum};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Parser, ValueEnum, Debug, Deserialize, Clone, Serialize)]
 pub(crate) enum Expansion {
-    TheWarWithin,
-    Dragonflight,
-    Shadowlands,
-    BattleForAzeroth,
-    Legion,
+    TWW,
+    DF,
+    SL,
+    BFA,
+    L,
 }
+
+impl Default for Expansion {
+    fn default() -> Self {
+        Expansion::TWW
+    }
+}
+
 impl Into<u8> for Expansion {
     fn into(self) -> u8 {
         match self {
-            Expansion::TheWarWithin => 10,
-            Expansion::Dragonflight => 9,
-            Expansion::Shadowlands => 8,
-            Expansion::BattleForAzeroth => 7,
-            Expansion::Legion => 6,
+            Expansion::TWW => 10,
+            Expansion::DF => 9,
+            Expansion::SL => 8,
+            Expansion::BFA => 7,
+            Expansion::L => 6,
         }
     }
 }

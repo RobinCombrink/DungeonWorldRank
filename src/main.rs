@@ -4,7 +4,7 @@ use clap::{Args, Parser};
 use log::LevelFilter;
 use std::io::Write;
 
-use crate::character::Region;
+use crate::{character::Region, expansion::Expansion};
 
 mod api_client;
 mod character;
@@ -15,13 +15,20 @@ mod mythic_plus_dungeons;
 
 #[derive(Parser, Debug)]
 enum Command {
-    #[clap(visible_alias = "c", visible_alias = "char", visible_alias = "character")]
+    #[clap(
+        visible_alias = "c",
+        visible_alias = "char",
+        visible_alias = "character"
+    )]
     CharacterRank(CharacterRankArgs),
     HistoricalDungeonRank(HistoricalDungeonRankArgs),
 }
 
 #[derive(Args, Debug)]
-#[clap(name = "What's My World Rank", about = "Get the rank for a specific character for a season from an expansion")]
+#[clap(
+    name = "What's My World Rank",
+    about = "Get the rank for a specific character for a season from an expansion"
+)]
 struct CharacterRankArgs {
     #[clap(short = 'n', long, default_value = "meleekick")]
     name: String,
@@ -29,6 +36,8 @@ struct CharacterRankArgs {
     realm: String,
     #[clap(long, default_value = "eu")]
     region: character::Region,
+    #[clap(long, default_value = "tww")]
+    expansion: Expansion,
 }
 
 impl Default for CharacterRankArgs {
@@ -37,6 +46,7 @@ impl Default for CharacterRankArgs {
             name: "meleekick".to_owned(),
             realm: "ravencrest".to_owned(),
             region: Region::EU,
+            expansion: Expansion::default(),
         }
     }
 }
@@ -84,11 +94,14 @@ async fn main() -> Result<()> {
     }
 }
 
-async fn get_character_rank(client: ApiClient, args: CharacterRankArgs) -> Result<()> {
+async fn get_character_rank(
+    client: ApiClient,
+    args: CharacterRankArgs,
+) -> Result<()> {
     let character = client
         .get_character(args.region, args.realm, args.name)
         .await?;
-    let world_rank = character.get_world_rank(client).await?;
+    let world_rank = character.get_world_rank(client, args.expansion).await?;
     println!("{}", world_rank);
     Ok(())
 }

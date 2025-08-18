@@ -35,8 +35,6 @@ pub struct Run {
     pub mythic_level: u32,
     pub score: f64,
     pub period: u32,
-    // Since the structure of affixes isn’t provided (it’s an empty array in the sample),
-    // we use a generic serde_json::Value.
     pub affixes: Vec<Value>,
     pub logged_run_id: u64,
     pub num_chests: u32,
