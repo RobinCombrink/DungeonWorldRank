@@ -15,12 +15,13 @@ mod mythic_plus_dungeons;
 
 #[derive(Parser, Debug)]
 enum Command {
+    #[clap(visible_alias = "c", visible_alias = "char", visible_alias = "character")]
     CharacterRank(CharacterRankArgs),
     HistoricalDungeonRank(HistoricalDungeonRankArgs),
 }
 
 #[derive(Args, Debug)]
-#[clap(name = "What's My World Rank")]
+#[clap(name = "What's My World Rank", about = "Get the rank for a specific character for a season from an expansion")]
 struct CharacterRankArgs {
     #[clap(short = 'n', long, default_value = "meleekick")]
     name: String,
