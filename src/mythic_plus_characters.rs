@@ -123,8 +123,7 @@ pub struct Region {
 pub struct Ui {
     pub region: String,
     pub season: String,
-    // "class" is a reserved keyword in Rust so we use a raw identifier.
-    pub r#class: String,
+    pub class: String,
     pub role: String,
     pub page: u32,
     pub page_size: u32,
