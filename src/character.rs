@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use anyhow::Result;
 use clap::{Parser, ValueEnum};
+use futures::join;
 use serde::{Deserialize, Serialize};
 
 use crate::{api_client::ApiClient, expansion::Expansion};
@@ -32,7 +33,7 @@ impl Display for Region {
 pub struct CharacterResponse {
     pub name: String,
     pub race: String,
-    pub class: String,
+    pub class: Class,
     pub active_spec_name: String,
     pub active_spec_role: String,
     pub gender: String,
@@ -47,6 +48,23 @@ pub struct CharacterResponse {
     pub profile_banner: String,
     #[serde(rename = "mythic_plus_ranks")]
     pub mythic_plus_ranks: MythicPlusRanks,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum Class {
+    DeathKnight,
+    DemonHunter,
+    Druid,
+    Evoker,
+    Hunter,
+    Mage,
+    Monk,
+    Paladin,
+    Priest,
+    Rogue,
+    Shaman,
+    Warlock,
+    Warrior,
 }
 
 #[derive(Debug, Deserialize)]
@@ -145,12 +163,13 @@ impl CharacterResponse {
         let character_rank = CharacterRank::from(&self);
         let season = client.get_current_season(expansion).await?;
 
-        let total_world_characters = client.get_total_characters(&season).await?;
-        let total_class_characters = client
-            .get_total_characters_by_class(&self.class, &season)
-            .await?;
+        let class = &serde_json::to_string(&self.class)?;
+        let (total_world_characters, total_class_characters) = join!(
+            client.get_total_characters(&season),
+            client.get_total_characters_by_class(class, &season)
+        );
 
-        let world_details = WorldDetails::new(total_world_characters, total_class_characters);
+        let world_details = WorldDetails::new(total_world_characters?, total_class_characters?);
 
         Ok(CharacterWorldRank::new(character_rank, world_details))
     }
