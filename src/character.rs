@@ -170,8 +170,8 @@ impl CharacterResponse {
         let season = client.get_current_season(expansion).await?;
 
         let (total_world_characters, total_class_characters) = join!(
-            client.get_total_characters(&season),
-            client.get_total_characters_by_class(self.class, &season)
+            client.get_total_characters(&season, None),
+            client.get_total_characters(&season, Some(self.class))
         );
 
         let world_details = WorldDetails::new(total_world_characters?, total_class_characters?);

@@ -86,11 +86,11 @@ impl ApiClient {
         CharacterResponse::from_response(response).await
     }
 
-    pub async fn get_total_characters(&self, season: &Season) -> Result<u32> {
-        let first_characters_page = self.get_mythic_plus_characters(0, season).await?;
+    pub async fn get_total_characters(&self, season: &Season, class: Option<Class>) -> Result<u32> {
+        let first_characters_page = self.get_mythic_plus_characters(0, season, class.as_ref()).await?;
 
         let last_characters_page = self
-            .get_mythic_plus_characters(first_characters_page.rankings.ui.last_page, season)
+            .get_mythic_plus_characters(first_characters_page.rankings.ui.last_page, season, class.as_ref())
             .await?;
 
         let total_characters_from_pages = last_characters_page.rankings.ui.page_size
@@ -101,30 +101,11 @@ impl ApiClient {
         Ok(total_characters)
     }
 
-    pub async fn get_total_characters_by_class(&self, class: Class, season: &Season) -> Result<u32> {
-        let first_characters_page = self
-            .get_mythic_plus_characters_by_class(&class, 0, season)
-            .await?;
-
-        let last_characters_page = self
-            .get_mythic_plus_characters_by_class(
-                &class,
-                first_characters_page.rankings.ui.last_page,
-                season,
-            )
-            .await?;
-
-        let total_characters_from_pages = last_characters_page.rankings.ui.page_size
-            * (last_characters_page.rankings.ui.last_page - 1);
-        let total_characters = total_characters_from_pages
-            + last_characters_page.rankings.ranked_characters.len() as u32;
-
-        Ok(total_characters)
-    }
     pub async fn get_mythic_plus_characters(
         &self,
         page: u32,
         season: &Season,
+        class: Option<&Class>,
     ) -> Result<MythicPlusCharactersResponse> {
         let url = self.base_url.join("mythic-plus/rankings/characters")?;
 
@@ -134,34 +115,10 @@ impl ApiClient {
             .query(&[
                 ("region", "world"),
                 ("season", &season.slug),
-                ("class", "all"),
-                ("role", "all"),
-                ("page", &format!("{:?}", page)),
-            ])
-            .send()
-            .await?;
-
-        let url = response.url();
-        debug!("{}", url);
-
-        MythicPlusCharactersResponse::from_response(response).await
-    }
-
-    pub async fn get_mythic_plus_characters_by_class(
-        &self,
-        class: &Class,
-        page: u32,
-        season: &Season,
-    ) -> Result<MythicPlusCharactersResponse> {
-        let url = self.base_url.join("mythic-plus/rankings/characters")?;
-
-        let response = self
-            .client
-            .get(url)
-            .query(&[
-                ("region", "world"),
-                ("season", &season.slug),
-                ("class", &format!("{}", class)),
+                (
+                    "class",
+                    &class.map_or_else(|| "all".to_owned(), |class| format!("{}", class)),
+                ),
                 ("role", "all"),
                 ("page", &format!("{:?}", page)),
             ])
