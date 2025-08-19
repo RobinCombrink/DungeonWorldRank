@@ -67,6 +67,12 @@ pub enum Class {
     Warrior,
 }
 
+impl Display for Class {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("{:#?}", self))
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct MythicPlusRanks {
     pub overall: RankDetails,
@@ -163,7 +169,7 @@ impl CharacterResponse {
         let character_rank = CharacterRank::from(&self);
         let season = client.get_current_season(expansion).await?;
 
-        let class = &serde_json::to_string(&self.class)?;
+        let class = &self.class.to_string();
         let (total_world_characters, total_class_characters) = join!(
             client.get_total_characters(&season),
             client.get_total_characters_by_class(class, &season)
