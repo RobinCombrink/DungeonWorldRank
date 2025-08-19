@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::{
-    character::{CharacterResponse, Region},
+    character::{CharacterResponse, Class, Region},
     expansion::{Expansion, Season, SeasonsResponse},
     from_response::FromResponse,
     mythic_plus_characters::MythicPlusCharactersResponse,
@@ -101,14 +101,14 @@ impl ApiClient {
         Ok(total_characters)
     }
 
-    pub async fn get_total_characters_by_class(&self, class: &str, season: &Season) -> Result<u32> {
+    pub async fn get_total_characters_by_class(&self, class: Class, season: &Season) -> Result<u32> {
         let first_characters_page = self
-            .get_mythic_plus_characters_by_class(class, 0, season)
+            .get_mythic_plus_characters_by_class(&class, 0, season)
             .await?;
 
         let last_characters_page = self
             .get_mythic_plus_characters_by_class(
-                class,
+                &class,
                 first_characters_page.rankings.ui.last_page,
                 season,
             )
@@ -149,7 +149,7 @@ impl ApiClient {
 
     pub async fn get_mythic_plus_characters_by_class(
         &self,
-        class: &str,
+        class: &Class,
         page: u32,
         season: &Season,
     ) -> Result<MythicPlusCharactersResponse> {
