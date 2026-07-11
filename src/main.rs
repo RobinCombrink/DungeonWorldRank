@@ -8,6 +8,7 @@ use crate::{character::Region, expansion::Expansion};
 
 mod api_client;
 mod character;
+mod character_mythic_plus_ranks;
 mod expansion;
 mod from_response;
 mod mythic_plus_characters;
@@ -94,10 +95,7 @@ async fn main() -> Result<()> {
     }
 }
 
-async fn get_character_rank(
-    client: ApiClient,
-    args: CharacterRankArgs,
-) -> Result<()> {
+async fn get_character_rank(client: ApiClient, args: CharacterRankArgs) -> Result<()> {
     let character = client
         .get_character(args.region, args.realm, args.name)
         .await?;
