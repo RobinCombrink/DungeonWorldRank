@@ -32,7 +32,6 @@ impl Display for Region {
 #[derive(Debug, Deserialize)]
 pub struct CharacterResponse {
     pub name: String,
-    pub race: String,
     pub class: Class,
     pub region: String,
     pub realm: String,
@@ -66,15 +65,11 @@ impl Display for Class {
 pub struct MythicPlusRanks {
     pub overall: RankDetails,
     pub class: RankDetails,
-    pub dps: RankDetails,
-    pub class_dps: RankDetails,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RankDetails {
     pub world: u32,
-    pub region: u32,
-    pub realm: u32,
 }
 
 pub struct CharacterRank {
