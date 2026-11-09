@@ -168,3 +168,6 @@ impl CharacterResponse {
         Ok(CharacterWorldRank::new(character_rank, world_details))
     }
 }
+
+#[cfg(test)]
+mod tests;
