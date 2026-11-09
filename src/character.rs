@@ -126,12 +126,11 @@ impl CharacterWorldRank {
         }
     }
     fn calculate_world_percentile(&self) -> f64 {
-        self.character_rank.world_rank as f64 / self.world_details.total_characters as f64
-            * 100 as f64
+        self.character_rank.world_rank as f64 / self.world_details.total_characters as f64 * 100_f64
     }
     fn calcualte_class_percentile(&self) -> f64 {
         self.character_rank.class_rank as f64 / self.world_details.total_class_characters as f64
-            * 100 as f64
+            * 100_f64
     }
 }
 

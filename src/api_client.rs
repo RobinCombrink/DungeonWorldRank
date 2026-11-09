@@ -238,7 +238,7 @@ impl ApiClient {
             .query(&[
                 ("region", "world"),
                 ("season", "season-tww-2"),
-                ("dungeon", &format!("{}", dungeon)),
+                ("dungeon", &dungeon.to_string()),
                 ("period", "0"),
                 ("limit", "50"),
                 ("recent", "false"),

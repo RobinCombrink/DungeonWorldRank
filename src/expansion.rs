@@ -1,8 +1,9 @@
 use clap::{Parser, ValueEnum};
 use serde::{Deserialize, Serialize};
 
-#[derive(Parser, ValueEnum, Debug, Deserialize, Clone, Serialize)]
+#[derive(Parser, ValueEnum, Debug, Deserialize, Clone, Serialize, Default)]
 pub(crate) enum Expansion {
+    #[default]
     TWW,
     DF,
     SL,
@@ -10,15 +11,9 @@ pub(crate) enum Expansion {
     L,
 }
 
-impl Default for Expansion {
-    fn default() -> Self {
-        Expansion::TWW
-    }
-}
-
-impl Into<u8> for Expansion {
-    fn into(self) -> u8 {
-        match self {
+impl From<Expansion> for u8 {
+    fn from(val: Expansion) -> Self {
+        match val {
             Expansion::TWW => 10,
             Expansion::DF => 9,
             Expansion::SL => 8,
