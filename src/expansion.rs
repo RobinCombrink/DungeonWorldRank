@@ -4,20 +4,20 @@ use serde::{Deserialize, Serialize};
 #[derive(Parser, ValueEnum, Debug, Deserialize, Clone, Serialize, Default)]
 pub(crate) enum Expansion {
     #[default]
-    TWW,
+    Tww,
     DF,
     SL,
-    BFA,
+    Bfa,
     L,
 }
 
 impl From<Expansion> for u8 {
-    fn from(val: Expansion) -> Self {
-        match val {
-            Expansion::TWW => 10,
+    fn from(expansion: Expansion) -> Self {
+        match expansion {
+            Expansion::Tww => 10,
             Expansion::DF => 9,
             Expansion::SL => 8,
-            Expansion::BFA => 7,
+            Expansion::Bfa => 7,
             Expansion::L => 6,
         }
     }
