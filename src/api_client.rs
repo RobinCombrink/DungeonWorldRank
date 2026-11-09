@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use crate::{
     character::{CharacterResponse, Class, Region},
-    character_mythic_plus_ranks::CharacterMythicPlusProgressResponse,
     expansion::{Expansion, Season, SeasonsResponse},
     from_response::FromResponse,
     mythic_plus_characters::MythicPlusCharactersResponse,
@@ -10,7 +9,6 @@ use crate::{
 };
 use anyhow::anyhow;
 use anyhow::Result;
-use futures::join;
 use log::debug;
 use reqwest::{
     Url, {Client, ClientBuilder},
@@ -61,30 +59,6 @@ impl ApiClient {
             .into_iter()
             .find(|item| item.is_main_season)
             .ok_or_else(|| anyhow!("Could not find current season"))
-    }
-
-    pub async fn get_mythic_plus_character(
-        &self,
-        region: Region,
-        realm: impl Into<String>,
-        name: impl Into<String>,
-        season: &Season,
-    ) -> Result<CharacterMythicPlusProgressResponse> {
-        let url = self
-            .base_url
-            .join("characters/")?
-            .join(region.to_string().as_str())?
-            .join(&realm.into())?
-            .join(&name.into())?
-            .join("mythic-plus-progress")?;
-
-        let response = self
-            .client
-            .get(url)
-            .query(&[("season", &season.slug)])
-            .send()
-            .await?;
-        CharacterMythicPlusProgressResponse::from_response(response).await
     }
 
     pub async fn get_character(

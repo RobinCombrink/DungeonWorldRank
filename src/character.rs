@@ -5,7 +5,7 @@ use clap::{Parser, ValueEnum};
 use futures::join;
 use serde::{Deserialize, Serialize};
 
-use crate::{api_client::ApiClient, character_mythic_plus_ranks::{CharacterMythicPlusProgress, CharacterMythicPlusProgressResponse}, expansion::Expansion, mythic_plus_characters::MythicPlusCharactersResponse};
+use crate::{api_client::ApiClient, expansion::Expansion};
 
 #[derive(Parser, ValueEnum, Debug, Deserialize, Clone, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -27,6 +27,16 @@ impl Display for Region {
             Region::TW => f.write_str("tw"),
         }
     }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CharacterResponse {
+    pub name: String,
+    pub race: String,
+    pub class: Class,
+    pub region: String,
+    pub realm: String,
+    pub mythic_plus_ranks: MythicPlusRanks,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -75,8 +85,8 @@ pub struct CharacterRank {
     pub class_rank: u32,
 }
 
-impl From<&CharacterMythicPlusProgress> for CharacterRank {
-    fn from(value: &CharacterMythicPlusProgress) -> Self {
+impl From<&CharacterResponse> for CharacterRank {
+    fn from(value: &CharacterResponse) -> Self {
         CharacterRank {
             name: value.name.clone(),
             realm: value.realm.clone(),

@@ -8,7 +8,6 @@ use crate::{character::Region, expansion::Expansion};
 
 mod api_client;
 mod character;
-mod character_mythic_plus_ranks;
 mod expansion;
 mod from_response;
 mod mythic_plus_characters;
