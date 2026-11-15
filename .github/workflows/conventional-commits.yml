@@ -1,0 +1,17 @@
+name: conventional-commits
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    uses: RobinCombrink/actions-conventional-commits/.github/workflows/conventional-commits.yml@8a72af59373164187df79b733071a431bf7e5dec # v2.0.0
