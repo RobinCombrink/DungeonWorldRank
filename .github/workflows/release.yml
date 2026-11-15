@@ -1,0 +1,15 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+
+jobs:
+  release:
+    uses: RobinCombrink/actions-release/.github/workflows/release.yml@728b67450bcefe04ccce6bed2df5ae9ea1f173d7 # v1.2.1
